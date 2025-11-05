@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cybernetic AI Core</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg-color: #05060a;
+      --grid-color: rgba(0, 255, 255, 0.05);
+      --core-glow: #37f3ff;
+      --accent: #8b5cf6;
+      --accent-2: #22d3ee;
+      --text: #f8fafc;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      font-family: "Orbitron", "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, rgba(14, 116, 144, 0.25), transparent 55%),
+                  radial-gradient(circle at bottom, rgba(139, 92, 246, 0.35), transparent 60%),
+                  #020409;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: 5vmin;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: -100vh;
+      background-image: linear-gradient(var(--grid-color) 1px, transparent 1px),
+                        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+      background-size: 60px 60px;
+      transform: perspective(600px) rotateX(70deg);
+      animation: gridFloat 12s linear infinite;
+      opacity: 0.6;
+      z-index: -1;
+    }
+
+    @keyframes gridFloat {
+      0% { transform: perspective(600px) rotateX(70deg) translateY(0); }
+      100% { transform: perspective(600px) rotateX(70deg) translateY(60px); }
+    }
+
+    main {
+      display: flex;
+      gap: clamp(2rem, 5vw, 4rem);
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      max-width: 1200px;
+      width: 100%;
+    }
+
+    .core {
+      position: relative;
+      width: min(70vw, 420px);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(55, 243, 255, 0.5) 0%, rgba(13, 148, 136, 0.3) 40%, rgba(2, 6, 23, 0.9) 75%),
+                  radial-gradient(circle, rgba(139, 92, 246, 0.45), rgba(15, 23, 42, 0.95));
+      display: grid;
+      place-items: center;
+      box-shadow: 0 0 65px rgba(34, 211, 238, 0.35), inset 0 0 40px rgba(59, 130, 246, 0.4);
+      overflow: hidden;
+    }
+
+    .core::before,
+    .core::after {
+      content: "";
+      position: absolute;
+      inset: 12%;
+      border-radius: 50%;
+      border: 2px solid rgba(56, 189, 248, 0.5);
+      animation: rotateRing 14s linear infinite;
+      mix-blend-mode: screen;
+    }
+
+    .core::after {
+      inset: 25%;
+      animation-direction: reverse;
+      border-color: rgba(139, 92, 246, 0.4);
+    }
+
+    @keyframes rotateRing {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .pulse {
+      position: absolute;
+      width: 55%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(34, 211, 238, 0.7), rgba(30, 64, 175, 0.3) 60%, transparent 70%);
+      animation: pulse 4s ease-in-out infinite;
+      box-shadow: 0 0 45px rgba(59, 130, 246, 0.6);
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.08); opacity: 0.45; }
+    }
+
+    .data-stream {
+      position: absolute;
+      width: 200%;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.9), transparent);
+      animation: dataFlow 2.4s linear infinite;
+      opacity: 0.6;
+    }
+
+    .data-stream:nth-child(odd) {
+      animation-duration: 3s;
+      filter: hue-rotate(90deg);
+    }
+
+    @keyframes dataFlow {
+      0% { transform: rotate(12deg) translateX(-50%); }
+      100% { transform: rotate(12deg) translateX(50%); }
+    }
+
+    .info-panel {
+      position: absolute;
+      bottom: 6%;
+      padding: 12px 18px;
+      border-radius: 12px;
+      background: rgba(2, 6, 23, 0.7);
+      border: 1px solid rgba(14, 165, 233, 0.25);
+      backdrop-filter: blur(6px);
+      display: flex;
+      gap: 18px;
+      text-transform: uppercase;
+      font-size: clamp(0.65rem, 0.9vw, 0.85rem);
+      letter-spacing: 0.12em;
+    }
+
+    .info-panel span {
+      color: var(--accent-2);
+    }
+
+    .ring-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    #energy-ring {
+      width: min(80vw, 420px);
+      height: min(80vw, 420px);
+      max-width: 480px;
+      max-height: 480px;
+      border-radius: 50%;
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
+    .ring-panel button {
+      padding: 0.6rem 1.2rem;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(34, 211, 238, 0.15), rgba(139, 92, 246, 0.35));
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.25);
+    }
+
+    .ring-panel button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 35px rgba(59, 130, 246, 0.35);
+    }
+
+    .ring-panel button:active {
+      transform: translateY(0);
+      box-shadow: 0 6px 18px rgba(59, 130, 246, 0.3);
+    }
+
+    .ring-caption {
+      font-size: 0.85rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(226, 232, 240, 0.7);
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="core" role="img" aria-label="Cybernetic AI Core visualization">
+      <div class="pulse"></div>
+      <div class="data-stream" style="top: 30%;"></div>
+      <div class="data-stream" style="top: 50%; animation-delay: -1.2s;"></div>
+      <div class="data-stream" style="top: 70%; animation-delay: -0.6s;"></div>
+      <div class="info-panel">
+        <div>Core Temp <span>417°K</span></div>
+        <div>Flux <span>92%</span></div>
+        <div>AI Sync <span>99.4%</span></div>
+      </div>
+    </div>
+    <div class="ring-panel">
+      <canvas id="energy-ring" width="512" height="512" role="img" aria-label="Harmonic energy ring"></canvas>
+      <div id="energy-meter" style="width:100%;height:8px;background:#111;margin-top:12px;border-radius:4px;">
+        <div id="bar" style="height:100%;width:0%;background:linear-gradient(90deg,#0ff,#f0f);border-radius:4px;"></div>
+      </div>
+      <button type="button" onclick="saveCanvas()">Save Frame</button>
+      <p class="ring-caption">Realtime energy color map from data/energy_stream.json</p>
+    </div>
+  </main>
+  <script type="module">
+    import { createEnergyRing } from "./power_ring.js";
+
+    const canvas = document.getElementById("energy-ring");
+    createEnergyRing(canvas, "data/energy_stream.json");
+  </script>
+  <script>
+    function saveCanvas() {
+      const canvas = document.getElementById('energy-ring');
+      const link = document.createElement('a');
+      link.download = 'AI_Core_Frame.png';
+      link.href = canvas.toDataURL();
+      link.click();
+    }
+  </script>
+</body>
+</html>
