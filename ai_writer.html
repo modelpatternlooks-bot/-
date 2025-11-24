@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Writing Studio</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: radial-gradient(circle at 20% 20%, rgba(111, 183, 255, 0.1), transparent 35%),
+            radial-gradient(circle at 80% 0%, rgba(255, 163, 214, 0.15), transparent 40%),
+            #0f172a;
+      --card-bg: rgba(255, 255, 255, 0.07);
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #e2e8f0;
+      --muted: #cbd5e1;
+      --accent: #7c3aed;
+      --accent-2: #10b981;
+      --shadow: 0 16px 60px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Inter", "Sarabun", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: grid;
+      place-items: center;
+      padding: 40px 16px;
+    }
+
+    .app {
+      width: min(1200px, 100%);
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    header {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent), #a855f7 45%, #22d3ee);
+      display: grid;
+      place-items: center;
+      color: #0b1021;
+      font-weight: 800;
+      letter-spacing: -1px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.6rem;
+      letter-spacing: -0.02em;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .card, textarea, input, select {
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      color: var(--text);
+    }
+
+    .card {
+      padding: 14px;
+      display: grid;
+      gap: 8px;
+    }
+
+    label {
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    input, select, textarea {
+      padding: 12px 14px;
+      outline: none;
+      font-size: 0.95rem;
+    }
+
+    textarea {
+      min-height: 140px;
+      resize: vertical;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    button {
+      border: none;
+      cursor: pointer;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      transition: transform 0.12s ease, box-shadow 0.2s ease;
+      color: #0b1021;
+    }
+
+    button.primary {
+      background: linear-gradient(135deg, var(--accent), #a855f7);
+      box-shadow: 0 14px 34px rgba(124, 58, 237, 0.35);
+      color: #f8fafc;
+    }
+
+    button.secondary { background: #e2e8f0; color: #0f172a; }
+    button.ghost { background: transparent; border: 1px solid var(--border); color: var(--text); }
+    button:hover { transform: translateY(-1px); }
+
+    .output {
+      margin-top: 10px;
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px dashed var(--border);
+      border-radius: 16px;
+      min-height: 220px;
+      white-space: pre-wrap;
+      line-height: 1.6;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      background: rgba(124, 58, 237, 0.12);
+      border: 1px solid rgba(124, 58, 237, 0.22);
+    }
+
+    .small { color: var(--muted); font-size: 0.9rem; }
+    .stats { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    .slider-value { font-weight: 700; }
+
+    @media (max-width: 720px) { body { padding: 16px; } }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div class="logo">AI</div>
+      <div>
+        <h1>AI Writing Studio</h1>
+        <p>เวิร์กสเปซสร้างงานเขียนอย่างรวดเร็ว ปรับโทนเสียง สไตล์ และความยาวได้ทันที</p>
+      </div>
+      <span class="badge" aria-label="Offline-ready">⚡ ใช้งานได้ทันที (HTML เดียว)</span>
+    </header>
+
+    <section class="grid" aria-label="form area">
+      <div class="card">
+        <label for="topic">หัวข้อ / สิ่งที่อยากเขียน</label>
+        <input id="topic" placeholder="เช่น แนวคิดธุรกิจใหม่, รีวิวสินค้า, นิยายสั้น" />
+      </div>
+      <div class="card">
+        <label for="audience">กลุ่มผู้อ่าน</label>
+        <input id="audience" placeholder="วัยทำงาน, นักเรียน, ลูกค้าบริษัท" />
+      </div>
+      <div class="card">
+        <label for="tone">โทนเสียง</label>
+        <select id="tone">
+          <option value="friendly">เป็นกันเอง</option>
+          <option value="professional">มืออาชีพ</option>
+          <option value="inspiring">สร้างแรงบันดาลใจ</option>
+          <option value="playful">สนุกสนาน</option>
+        </select>
+      </div>
+      <div class="card">
+        <label for="style">สไตล์</label>
+        <select id="style">
+          <option value="article">บทความ</option>
+          <option value="story">เล่าเรื่อง</option>
+          <option value="copy">ข้อความขายของ</option>
+          <option value="social">โพสต์โซเชียล</option>
+        </select>
+      </div>
+    </section>
+
+    <section class="grid" aria-label="details area">
+      <div class="card">
+        <label for="prompt">ประเด็น/ไอเดีย (ใส่ได้หลายบรรทัด)</label>
+        <textarea id="prompt" placeholder="ร่าง bullet points หรือมู้ด & ฟีลที่อยากได้"></textarea>
+      </div>
+      <div class="card">
+        <label for="length">ความยาว (ย่อหน้า)</label>
+        <input type="range" id="length" min="1" max="6" step="1" value="3" />
+        <div class="stats">
+          <span class="slider-value" id="lengthValue">3 ย่อหน้า</span>
+          <span class="small">เลื่อนเพื่อเพิ่ม/ลดความละเอียด</span>
+        </div>
+        <label for="creative">ความสร้างสรรค์</label>
+        <input type="range" id="creative" min="0" max="1" step="0.05" value="0.45" />
+        <div class="stats">
+          <span class="slider-value" id="creativeValue">กลาง</span>
+          <span class="small">สูง = บรรยายจัดจ้าน / ต่ำ = กระชับตรงประเด็น</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="controls" role="group" aria-label="actions">
+      <button class="primary" id="generate">สร้างร่าง</button>
+      <button class="secondary" id="rewrite">ขยาย / เขียนใหม่</button>
+      <button class="ghost" id="summarize">สรุปใจความ</button>
+      <button class="ghost" id="copy">คัดลอก</button>
+      <button class="ghost" id="download">ดาวน์โหลด .txt</button>
+    </div>
+
+    <div class="output" id="output" aria-live="polite">เริ่มจากการใส่หัวข้อและกด "สร้างร่าง"</div>
+  </main>
+
+  <script>
+    const topicEl = document.querySelector('#topic');
+    const audienceEl = document.querySelector('#audience');
+    const toneEl = document.querySelector('#tone');
+    const styleEl = document.querySelector('#style');
+    const promptEl = document.querySelector('#prompt');
+    const lengthEl = document.querySelector('#length');
+    const creativeEl = document.querySelector('#creative');
+    const outputEl = document.querySelector('#output');
+
+    const lengthValue = document.querySelector('#lengthValue');
+    const creativeValue = document.querySelector('#creativeValue');
+
+    const tones = {
+      friendly: {
+        verbs: ['ชวนคุย', 'เล่าให้ฟัง', 'ชี้ทางลัด', 'แบ่งปัน'],
+        adjectives: ['อบอุ่น', 'ใกล้ชิด', 'สบาย ๆ', 'เป็นกันเอง'],
+      },
+      professional: {
+        verbs: ['สรุปประเด็น', 'อธิบายชัด', 'เสนอแนวทาง', 'จัดลำดับข้อมูล'],
+        adjectives: ['เป็นระบบ', 'น่าเชื่อถือ', 'ชัดเจน', 'ตรงประเด็น'],
+      },
+      inspiring: {
+        verbs: ['ปลุกแรงบันดาลใจ', 'ชวนมองภาพอนาคต', 'เติมพลัง', 'ชี้ให้เห็นโอกาส'],
+        adjectives: ['ทรงพลัง', 'สดใหม่', 'มีไฟ', 'ขับเคลื่อนความฝัน'],
+      },
+      playful: {
+        verbs: ['เล่นคำ', 'หยอกล้อ', 'เล่าอย่างมัน', 'ใส่อารมณ์ขัน'],
+        adjectives: ['สดใส', 'มีจังหวะ', 'สนุกสนาน', 'ชวนยิ้ม'],
+      },
+    };
+
+    const palettes = {
+      article: ['เบื้องต้น', 'เจาะลึก', 'ตัวอย่างใช้งาน', 'สรุปประเด็น'],
+      story: ['เปิดฉาก', 'จุดเปลี่ยน', 'ความรู้สึก', 'บทสรุป'],
+      copy: ['ปัญหาที่เจอ', 'คุณค่า', 'ข้อเด่น', 'ชวนตัดสินใจ'],
+      social: ['hook', 'สั้น กระชับ', 'ชวนคุย', 'ปิดท้ายด้วย CTA'],
+    };
+
+    const enrichers = [
+      'เปรียบเทียบกับประสบการณ์จริง',
+      'สอดแทรกตัวอย่างสั้น ๆ',
+      'ชวนตั้งคำถามกับผู้อ่าน',
+      'โยงเข้ากับเทรนด์ปัจจุบัน',
+      'ชู Insight ที่คนมักมองข้าม',
+      'ทิ้งท้ายด้วยประโยคจดจำง่าย',
+    ];
+
+    const endings = [
+      'ปิดท้ายด้วยความเชื่อมั่นว่าเราทำได้',
+      'ฝากให้คิดและนำไปต่อยอดในแบบของคุณ',
+      'ชวนลองลงมือทันทีวันนี้',
+      'เพราะเรื่องนี้เปลี่ยนชีวิตประจำวันได้จริง',
+      'เตือนใจว่าเส้นทางเล็ก ๆ นำไปสู่ความต่างใหญ่',
+    ];
+
+    const systemSeed = 'ตัวช่วยเขียนที่ทำงานได้ในไฟล์เดียว พร้อมปรับโทนเสียงและความยาวได้อิสระ';
+
+    function mapCreativeValue(value) {
+      if (value < 0.25) return 'กระชับ';
+      if (value < 0.55) return 'กลาง';
+      if (value < 0.8) return 'บรรยายจัดเต็ม';
+      return 'จินตนาการสูงสุด';
+    }
+
+    function pick(list) { return list[Math.floor(Math.random() * list.length)]; }
+
+    function shuffleText(text) {
+      return text
+        .split(' ')
+        .sort(() => (Math.random() - 0.5))
+        .slice(0, Math.max(6, text.split(' ').length - 2))
+        .join(' ');
+    }
+
+    function craftSentence(topic, toneKey, audience, style, creativeLevel) {
+      const tone = tones[toneKey];
+      const palette = palettes[style];
+      const opener = pick([
+        `ลอง${pick(tone.verbs)}เรื่อง ${topic} แบบ${pick(tone.adjectives)}`,
+        `มอง ${topic} ผ่านมุมมองใหม่ให้${audience || 'ผู้อ่าน'}`,
+        `ชวนคิดต่อยอด ${topic} ด้วยโทน ${toneKey}`,
+        `นี่คือสรุป ${topic} ฉบับ ${style}`,
+      ]);
+
+      const angle = pick(palette);
+      const enrich = Math.random() < creativeLevel + 0.2 ? pick(enrichers) : '';
+      const additive = creativeLevel > 0.7 ? ` พร้อมจังหวะคำแบบ ${shuffleText('สด ทันสมัย อ่านแล้วติดหู')}` : '';
+      return `${opener}${audience ? ` สำหรับ ${audience}` : ''} เน้น ${angle}${enrich ? ` และ ${enrich}` : ''}${additive ? `, ${additive}` : ''}.`;
+    }
+
+    function createParagraph(topic, toneKey, audience, style, creativeLevel) {
+      const sentences = [];
+      const seedIdeas = (promptEl.value || systemSeed).split(/\n+/).filter(Boolean);
+      const base = craftSentence(topic, toneKey, audience, style, creativeLevel);
+      sentences.push(base);
+      if (seedIdeas.length) {
+        const idea = pick(seedIdeas);
+        const detail = creativeLevel > 0.5
+          ? `เสริมด้วยประเด็น "${idea}" ให้มีภาพจำชัดเจน`
+          : `เน้นสารหลักคือ ${idea}`;
+        sentences.push(detail + '.');
+      }
+      if (creativeLevel > 0.65) {
+        sentences.push(`จบย่อหน้าด้วยโทน ${pick(['นุ่มลึก', 'เร้าใจ', 'สบาย ๆ', 'มั่นใจ'])} เพื่อรักษาจังหวะการอ่าน.`);
+      }
+      return sentences.join(' ');
+    }
+
+    function generateDraft(mode = 'fresh') {
+      const topic = topicEl.value.trim() || 'ไอเดียที่คุณกำลังคิดอยู่';
+      const audience = audienceEl.value.trim();
+      const tone = toneEl.value;
+      const style = styleEl.value;
+      const creative = Number(creativeEl.value);
+      const paragraphs = [];
+      const total = Number(lengthEl.value);
+      for (let i = 0; i < total; i++) {
+        paragraphs.push(createParagraph(topic, tone, audience, style, creative));
+      }
+      if (mode === 'rewrite') {
+        paragraphs.push(`ปรับใหม่ด้วยโทน ${tone} และสไตล์ ${style} ให้คมขึ้น โดยยึดโครงเดิมของคุณ`);
+      }
+      outputEl.textContent = paragraphs.join('\n\n');
+    }
+
+    function summarize() {
+      const text = outputEl.textContent.trim();
+      if (!text) return;
+      const sentences = text.split(/\n+/).filter(Boolean);
+      const keyword = topicEl.value || 'ประเด็นหลัก';
+      const summary = [
+        `สรุปย่อ: ${keyword} ในมุมมอง ${toneEl.options[toneEl.selectedIndex].text} สำหรับ ${audienceEl.value || 'ผู้อ่านทั่วไป'}.`,
+        `แก่นเรื่อง: ${pick(sentences).slice(0, 140)}...`,
+        `ปิดด้วย: ${pick(endings)}`,
+      ];
+      outputEl.textContent = summary.join('\n');
+    }
+
+    function copyText() {
+      const text = outputEl.textContent.trim();
+      if (!text) return;
+      navigator.clipboard.writeText(text).then(() => {
+        outputEl.dataset.flash = 'copied';
+        setTimeout(() => delete outputEl.dataset.flash, 1000);
+      });
+    }
+
+    function downloadText() {
+      const blob = new Blob([outputEl.textContent || ''], { type: 'text/plain' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'ai-writing.txt';
+      link.click();
+      URL.revokeObjectURL(link.href);
+    }
+
+    lengthEl.addEventListener('input', () => {
+      lengthValue.textContent = `${lengthEl.value} ย่อหน้า`;
+    });
+
+    creativeEl.addEventListener('input', () => {
+      creativeValue.textContent = mapCreativeValue(Number(creativeEl.value));
+    });
+
+    document.querySelector('#generate').addEventListener('click', () => generateDraft('fresh'));
+    document.querySelector('#rewrite').addEventListener('click', () => generateDraft('rewrite'));
+    document.querySelector('#summarize').addEventListener('click', summarize);
+    document.querySelector('#copy').addEventListener('click', copyText);
+    document.querySelector('#download').addEventListener('click', downloadText);
+
+    // initialize labels
+    creativeValue.textContent = mapCreativeValue(Number(creativeEl.value));
+  </script>
+</body>
+</html>
