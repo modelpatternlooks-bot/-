@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Screen Agent: ห้องทดลองสมอง</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #38bdf8;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #020617 0%, #0b1224 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 32px 16px;
+    }
+
+    .shell {
+      width: min(1100px, 100%);
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid #1f2a44;
+      box-shadow: 0 20px 80px rgba(0, 0, 0, 0.45);
+      border-radius: 20px;
+      padding: 32px;
+      backdrop-filter: blur(14px);
+    }
+
+    h1 {
+      margin: 0 0 4px;
+      font-size: 1.75rem;
+      letter-spacing: -0.02em;
+    }
+
+    p.lead {
+      margin: 0 0 20px;
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .panel {
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid #24304a;
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #cbd5e1;
+    }
+
+    textarea, input {
+      width: 100%;
+      border: 1px solid #334155;
+      background: #0f172a;
+      color: var(--text);
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    textarea:focus, input:focus {
+      border-color: var(--accent);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 130px;
+    }
+
+    .button-row {
+      margin-top: 14px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      appearance: none;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-weight: 700;
+      cursor: pointer;
+      background: linear-gradient(120deg, #22d3ee, #38bdf8, #6366f1);
+      color: #0b1021;
+      box-shadow: 0 10px 30px rgba(56, 189, 248, 0.35);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    button.secondary {
+      background: transparent;
+      border: 1px dashed #334155;
+      color: var(--text);
+      box-shadow: none;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 40px rgba(56, 189, 248, 0.45);
+    }
+
+    pre {
+      margin: 0;
+      background: #0b1222;
+      border: 1px solid #1f2a3d;
+      border-radius: 12px;
+      padding: 14px;
+      color: #cbd5e1;
+      font-size: 0.9rem;
+      overflow: auto;
+      min-height: 160px;
+    }
+
+    .pill-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .pill {
+      padding: 6px 10px;
+      background: #0f172a;
+      border: 1px solid #24304a;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      color: #cbd5e1;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-weight: 700;
+      background: rgba(34, 211, 238, 0.14);
+      color: #67e8f9;
+      border: 1px solid rgba(34, 211, 238, 0.35);
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+      <div>
+        <h1>AI Screen Agent: ห้องทดลองสมอง</h1>
+        <p class="lead">เครื่องมือนี้ใช้พิสูจน์ตรรกะของ AI Agent ของคุณ โดยการแปลงภาพหน้าจอและคำสั่ง ให้กลายเป็นแผนการกระทำ (JSON Action Plan)</p>
+      </div>
+      <div class="badge" title="Experimental mode active">🧪 ห้องทดลอง</div>
+    </div>
+
+    <div class="pill-row">
+      <span class="pill">รองรับการวางภาพหน้าจอเป็นลิงก์หรือคำบรรยาย</span>
+      <span class="pill">แตกคำสั่งออกเป็นขั้นตอนอัตโนมัติ</span>
+      <span class="pill">ส่งออก JSON Action Plan พร้อมอธิบาย</span>
+    </div>
+
+    <div class="grid">
+      <section class="panel">
+        <label for="screenshot">คำอธิบายภาพหน้าจอ / ลิงก์ภาพ</label>
+        <textarea id="screenshot" placeholder="ตัวอย่าง: หน้าจอแสดงรายชื่อตั๋ว support พร้อมปุ่ม Approve สีเขียว..."></textarea>
+
+        <label for="commands">คำสั่งที่คุณต้องการให้ Agent ปฏิบัติ</label>
+        <textarea id="commands" placeholder="1) เลือกตั๋วหมายเลข #4812\n2) ตรวจสอบรายละเอียด\n3) กด Approve"></textarea>
+
+        <label for="goal">เป้าหมายของแผน</label>
+        <input id="goal" type="text" placeholder="เช่น ยืนยันตั๋วและบันทึกหมายเหตุ" />
+
+        <div class="button-row">
+          <button id="generate">สร้าง JSON Action Plan</button>
+          <button class="secondary" id="reset">ล้างฟอร์ม</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <label>ผลลัพธ์ JSON Action Plan</label>
+        <pre id="output">{
+  "actions": [],
+  "explanation": "กรอกข้อมูลด้านซ้ายเพื่อเริ่มสร้างแผนการกระทำ"
+}</pre>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const screenshotField = document.getElementById("screenshot");
+    const commandField = document.getElementById("commands");
+    const goalField = document.getElementById("goal");
+    const output = document.getElementById("output");
+
+    const sanitizeLines = (text) =>
+      text
+        .split(/\r?\n/)
+        .map((line) => line.replace(/^\s*[-*\d.)]+\s*/, "").trim())
+        .filter(Boolean);
+
+    const buildActions = (lines) =>
+      lines.map((line, index) => ({
+        id: index + 1,
+        intent: line,
+        expectedOutcome: "สำเร็จ: " + line,
+      }));
+
+    const renderPlan = () => {
+      const screenshot = screenshotField.value.trim();
+      const goal = goalField.value.trim() || "ดำเนินการตามคำสั่ง";
+      const commands = sanitizeLines(commandField.value.trim());
+
+      const plan = {
+        title: "AI Screen Agent Action Plan",
+        goal,
+        context: screenshot || "ไม่ระบุภาพหน้าจอ (ใช้คำสั่งเป็นหลัก)",
+        actions: buildActions(commands),
+        explanation:
+          "ระบบจะแปลงคำสั่งทีละข้อเป็น action ที่มี intent และ expectedOutcome สำหรับ Screen Agent",
+      };
+
+      output.textContent = JSON.stringify(plan, null, 2);
+    };
+
+    document.getElementById("generate").addEventListener("click", renderPlan);
+    document.getElementById("reset").addEventListener("click", () => {
+      screenshotField.value = "";
+      commandField.value = "";
+      goalField.value = "";
+      output.textContent = JSON.stringify(
+        {
+          actions: [],
+          explanation: "กรอกข้อมูลด้านซ้ายเพื่อเริ่มสร้างแผนการกระทำ",
+        },
+        null,
+        2
+      );
+    });
+  </script>
+</body>
+</html>
